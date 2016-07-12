@@ -54,20 +54,12 @@ public class MainProgram {
 		
 		// boolean values determine which GSL service is availed
 		boolean availInfinium = false;
-			//boolean availFluidigm96 = false;
-			//boolean availFluidigm24 = false;
 		
-		
-		// indicates how many samples are provided for each specified service
-		int infiniumSampleCount = 0;
-			//int fluidigm96SampleCount = 0;
-			//int fluidigm24SampleCount = 0;
-		
-		// indicates the total number of samples, services and plates
+		// indicates the total number of samples
 		int totalNumberOfSamples = 0;
 		
-		// if at least one sample is transgenic, 'isTransgenic' is automatically true; otherwise false
-		boolean isTransgenic = false; 
+		// if at least one sample is transgenic, 'matClassification' is automatically true; otherwise false
+		boolean matClassification = false; 
 		
 		
 		String excelFilePath = "GSL SNP Genotyping Request Form Internal Clients JUN2016.xlsx";
@@ -81,7 +73,11 @@ public class MainProgram {
 	        Cell cell;
 	  
         	//// BLOCK 0001: HEADER VALUES /////////////////////////////////////////////////
-	        	
+	        	/*
+	        	Do NOT change the formatting of Form 1(table/cell positions). Doing so will affect these 
+	        	methods inside BLOCK 0001 and BLOCK 0002 
+	        	*/
+	        
 	        	// Requestor (LIMS Sender)
 	        	cell = requestSheet.getRow(7).getCell(2);
 	        	requestorID = cell.getStringCellValue();
@@ -125,8 +121,7 @@ public class MainProgram {
 	        	// GSL Infinium
 	        	cell = requestSheet.getRow(20).getCell(3);
 	        	if (cell.getNumericCellValue() != 0){
-            		infiniumSampleCount = (int)cell.getNumericCellValue();
-            		totalNumberOfSamples = totalNumberOfSamples + infiniumSampleCount;
+	        		totalNumberOfSamples += (int)cell.getNumericCellValue();
             		availInfinium = true;
             	}
 	        	
@@ -139,22 +134,19 @@ public class MainProgram {
 
         	
         	//// BLOCK 0003 : WRITING TO PRIMARY FILE FOR SELENIUM /////////////////////////////////
-	    		if(availInfinium){
-	            	//System.out.println("Client requests Infinium SNP chip with "+infiniumSampleCount+" samples");
-	            	
-	            	int sobra = (infiniumSampleCount % 94 == 0) ? 0 : 1;
-	            	int counter = (infiniumSampleCount / 94) + sobra;
+	    	
+        		if(availInfinium){
+	            	            	
+	            	int sobra = (totalNumberOfSamples % 94 == 0) ? 0 : 1;
+	            	int counter = (totalNumberOfSamples / 94) + sobra;
 	            	for(int i=0; i<counter; i++){
 	    	        	GenotypingService infinium = new GenotypingService("P109403", (3*serviceList.size())+1, i+1);
 	    	        	if(infinium.getMaterialClass()){
-	    	        		isTransgenic = true;
+	    	        		matClassification = true;
 	    	        	}
 	    	        	serviceList.add(infinium);
 	            	}
 	            }
-	            
-	    		int leftovers = (totalNumberOfSamples % 94 == 0) ? 0 : 1;
-	    		
 	    		boolean correctInfo = true;
 	            for(int i=0; i<serviceList.size(); i++){
 	            	if(!(serviceList.get(i).getCorrectness())){
@@ -168,7 +160,7 @@ public class MainProgram {
 	                FileWriter fwriter = new FileWriter(new File("requestInfo.txt"));
 	        		BufferedWriter bw = new BufferedWriter(fwriter);
 	        		
-	        		String str = (isTransgenic)? "Transgenic" : "Non-Transgenic";
+	        		String str = (matClassification)? "Transgenic" : "Non-Transgenic";
 	        		
 	        		bw.write("Classification of Materials,"+str+"\n");
 	        		bw.write("Order Type,"+defaultOrderType+"\n");
