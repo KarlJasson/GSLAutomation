@@ -8,17 +8,13 @@ import java.util.concurrent.TimeUnit;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.UnexpectedAlertBehaviour;
-import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -28,7 +24,6 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -45,7 +40,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 		
 			
 		System.setProperty("phantomjs.binary.path", "/usr/bin/phantomjs.exe");
-			
+		
+		// replace/correct the absolute path of log4j.properties
 		String log4jConfPath = "/home/karljasson/workspace/Selenium for GSL Form 1/log4j/log4j.properties";
 		PropertyConfigurator.configure(log4jConfPath);
 		
@@ -79,14 +75,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 		capabilities.setCapability("phantomjs.binary.path", "/usr/bin/phantomjs");
 		WebDriver driver = new PhantomJSDriver(capabilities);
 		
-		//WebDriver driver = new PhantomJSDriver(caps);
-		//WebDriver driver2 = new PhantomJSDriver(caps);		
-		//WebDriver driver = new PhantomJSDriver();
-		
+			
 		//System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
 		//WebDriver driver = new ChromeDriver(dc);
 		
-		//System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.Jdk14Logger");
+		
 			
 		String baseUrl =  "http://btree.ocimumbio.com/irri-test/";
 		WebElement myDynamicElement;
