@@ -39,7 +39,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 		public WebLoader(){
 		
 			
-		System.setProperty("phantomjs.binary.path", "/usr/bin/phantomjs.exe");
+		//System.setProperty("phantomjs.binary.path", "/usr/bin/phantomjs.exe");
 		
 		// replace/correct the absolute path of log4j.properties
 		String log4jConfPath = "/home/karljasson/workspace/Selenium for GSL Form 1/log4j/log4j.properties";
@@ -56,7 +56,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 		//caps.setCapability("phantomjs.binary.path", "/usr/bin/phantomjs");
 		//caps.setCapability("handlesAlerts", true);
 		
-		
+		/*/
 		DesiredCapabilities capabilities = new DesiredCapabilities();
 		ArrayList<String> cliArgsCap = new ArrayList<String>();
 		capabilities = DesiredCapabilities.phantomjs();
@@ -73,13 +73,35 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 		    PhantomJSDriverService.PHANTOMJS_GHOSTDRIVER_CLI_ARGS,
 		        new String[] { "--logLevel=2" });
 		capabilities.setCapability("phantomjs.binary.path", "/usr/bin/phantomjs");
-		WebDriver driver = new PhantomJSDriver(capabilities);
+		//WebDriver driver = new PhantomJSDriver(capabilities);
 		
-			
+		*/
+		
+		/*/////////
+		DesiredCapabilities caps = new DesiredCapabilities();
+	    caps.setJavascriptEnabled(true);
+	    caps.setCapability("takesScreenshot", true);
+	    caps.phantomjs().setCapability("handlesAlerts", true);
+	    
+	    //caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,"/Users/kpalis/Sides/APAC_LP/PhantomJS/bin/phantomjs");
+	    //if(isLocal) caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY,this.PHANTOMJS_PATH_LOCAL);
+	    //else caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "/usr/bin/phantomjs");
+	    caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "/usr/bin/phantomjs");
+	    WebDriver driver = new PhantomJSDriver(caps);
+		////*////////
+		
+		////
+		DesiredCapabilities caps = new DesiredCapabilities();
+    	caps.setJavascriptEnabled(true);
+    	
+    	System.out.println("JavascriptEnabled: "+Boolean.toString(caps.isJavascriptEnabled()));
+    	caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "/usr/bin/phantomjs");
+    	caps.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, new String[] {"--web-security=no", "--ignore-ssl-errors=yes"});
+    	WebDriver driver = new PhantomJSDriver(caps);
+		//*///
+		
 		//System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
 		//WebDriver driver = new ChromeDriver(dc);
-		
-		
 			
 		String baseUrl =  "http://btree.ocimumbio.com/irri-test/";
 		WebElement myDynamicElement;
@@ -112,15 +134,21 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 					driver.findElement(By.id("password")).clear();
 					driver.findElement(By.id("password")).sendKeys(logInPassword);
 
-				    try{
-				    	temp = driver.findElement(By.xpath("//img[@src='/irri-test/resources/styles/images/go-button.png']"));
-					    temp.click();
+					temp = driver.findElement(By.xpath("//img[@src='/irri-test/resources/styles/images/go-button.png']"));
+				    temp.click();
+
+				    try{   
+				    	////
 				    	if(driver.switchTo().alert() != null){
 				    		Alert ale = driver.switchTo().alert();
-				    		
 				    		ale.accept();
+				    		
 				    	}
-				    }catch(Exception eee){}
+				    	//*///
+				    	//((JavascriptExecutor) driver).executeScript("window.confirm = function(msg) { return true; }");
+				    }catch(Exception eee){
+				    	
+				    }
 				
 				    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 				    
@@ -136,6 +164,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 				driver.get("http://btree.ocimumbio.com/irri-test/app/module/ServiceRequest/create?hasSearch=true&btreeModuleId=ServiceRequest");
 				
 				driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+				System.out.println("Current URL: "+driver.getCurrentUrl());
 				
 			//// END BLOCK 0001 //////////////////////////////////////////////////////////////////////////////////////
 				
@@ -164,17 +193,28 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 				
 				System.out.println("Click 'search'");	
 				try{
+					
 					driver.findElement(By.id("Servicesearch")).click();
 				}catch(Exception e0001){
 					System.out.println("Click 'search' failed");	
 				}
 				
+			
+				
 				
 				myDynamicElement = (new WebDriverWait(driver, 15))
 						  .until(ExpectedConditions.presenceOfElementLocated(By.id("jqg_177491")));
 				// TO DO: Add a switch-case for what service to select
-				System.out.println("click infinium");
+				//driver.findElement(By.cssSelector("div[id^=ext-comp-1022] jqg_177491"));
+				
+				if(driver.findElements(By.id("jqg_177491")).size() != 0){
+					System.out.println("found infinium");	
+				}
 				driver.findElement(By.id("jqg_177491")).click();
+				
+				//WebElement unseen= driver.findElement(By.id("jqg_177491"));  
+				//JavascriptExecutor executor = (JavascriptExecutor)driver;  
+				//executor.executeScript("arguments[0].click();", unseen);  
 				
 				
 				
@@ -183,10 +223,23 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 				driver.findElement(By.id("ext-gen37")).click();
 				System.out.println("confirm select infinium");
 				
+				
+			
+				System.out.println(driver.findElement(By.id("Service")).getAttribute("value"));
+				//WebElement input = driver.findElements(By.className("formfloatnone")).get(1).findElement(By.id("Service"));
+				//WebElement tryHard = driver.findElements(By.className("formfloatnone")).get(1).findElement(By.xpath("//div[contains(@class,'entityLov')]"));
+				//System.out.println("Service: "+tryHard.getText());
+				
+				//System.out.println(tryHard.getAttribute("value"));
+				
 				System.out.println("Select recipient Individual");
 				myDynamicElement = (new WebDriverWait(driver, 25))
 						  .until(ExpectedConditions.presenceOfElementLocated(By.id("RecepientUser")));
-				new Select(driver.findElement(By.id("RecepientUser"))).selectByVisibleText(mappings.get("Recipient Individual"));
+				Select sel01 = new Select(driver.findElement(By.id("RecepientUser")));
+				//new Select(driver.findElement(By.id("RecepientUser"))).selectByVisibleText(mappings.get("Recipient Individual"));
+				sel01.selectByVisibleText(mappings.get("Recipient Individual"));
+								   
+				System.out.println("Recipient Individual: "+sel01.getFirstSelectedOption().getText());
 
 				System.out.println("sample type");
 				myDynamicElement = (new WebDriverWait(driver, 25))
@@ -208,10 +261,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 				driver.findElement(By.id("Comments")).sendKeys("Date submitted: "+mappings.get("Date submitted"));
 				
 				
-				driver.findElement(By.className("save")).sendKeys(Keys.RETURN);
+				//driver.findElement(By.className("save")).sendKeys(Keys.RETURN);
+				driver.findElement(By.className("save")).click();
+				
 				driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
 				
-				
+				System.out.println("Current URL: "+driver.getCurrentUrl());
 				myDynamicElement = (new WebDriverWait(driver, 25))
 						  .until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@href='#ServiceRequest_RequestPlateDiv']")));
 				driver.findElement(By.xpath("//a[@href='#ServiceRequest_RequestPlateDiv']")).click();
@@ -230,13 +285,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 					
 					
 					driver.findElement(By.id("file")).sendKeys("/home/karljasson/workspace/Selenium for GSL Form 1/"+mappings.get("FILE"+(i+1)));
-					driver.findElement(By.className("next")).sendKeys(Keys.RETURN);
+				
+					//driver.findElement(By.className("next")).sendKeys(Keys.RETURN);
+					driver.findElement(By.className("next")).click();
+					
 					driver.manage().timeouts().implicitlyWait(35, TimeUnit.SECONDS);
 					
-					
-					
-					driver.findElement(By.className("next")).sendKeys(Keys.RETURN);
-					//System.out.println("Next 2");
+					//driver.findElement(By.className("next")).sendKeys(Keys.RETURN);
+					driver.findElement(By.className("next")).click();
+
 					driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 					
 					if(driver.findElements(By.className("save")).size() != 0){
@@ -245,7 +302,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 						}catch(Exception eeh){
 							
 						}
-						driver.findElement(By.className("save")).sendKeys(Keys.RETURN);
+						
+						//sendKeys() works in ChromeDriver only
+						//driver.findElement(By.className("save")).sendKeys(Keys.RETURN);
+						
+						//click() works for PhantomJS
+						driver.findElement(By.className("save")).click();
+						
 						driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 					}
 					
@@ -266,6 +329,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 			///////////////////////////////*///////// END BLOOOOOCK//////////////////////////////////
 		}catch(Exception ey){
 			System.out.println("Error Encountered");
+			System.out.println("Stopped at: "+driver.getCurrentUrl());
 			System.out.println(ey.getMessage());
 			
 		}finally{
