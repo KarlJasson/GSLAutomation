@@ -52,14 +52,17 @@ public class MainProgram {
 		String defaultRecipientIndividual = "Annalhea Jarana";
 		String defaultSampleType = "GSLDNA";
 		
-		// boolean values determine which GSL service is availed
-		boolean availInfinium = false;
+		// String serviceAvailed determine which GSL service is availed
+		String serviceAvailed = "NONE";
 		
 		// indicates the total number of samples
 		int totalNumberOfSamples = 0;
 		
 		// if at least one sample is transgenic, 'matClassification' is automatically true; otherwise false
 		boolean matClassification = false; 
+		
+		
+		boolean noError = true;
 		
 		
 		String excelFilePath = "GSL SNP Genotyping Request Form Internal Clients JUN2016.xlsx";
@@ -70,8 +73,8 @@ public class MainProgram {
 			/**/
 			Workbook workbook = new XSSFWorkbook(inputStream);
 	        Sheet requestSheet = workbook.getSheetAt(0);
-	        Cell cell;
-	  
+	        Cell cell, cell2;
+	        	  
         	//// BLOCK 0001: HEADER VALUES /////////////////////////////////////////////////
 	        	/*
 	        	Do NOT change the formatting of Form 1(table/cell positions). Doing so will affect these 
@@ -118,12 +121,34 @@ public class MainProgram {
 	           
         	//// BLOCK 0002: GSL SERVICES //////////////////////////////////////////////////
 	        	
-	        	// GSL Infinium
+	        	// Infinium
 	        	cell = requestSheet.getRow(20).getCell(3);
-	        	if (cell.getNumericCellValue() != 0){
+	        	cell2 = requestSheet.getRow(17).getCell(3);
+	        	if (cell.getNumericCellValue() != 0 && cell2.getNumericCellValue() == 0){
 	        		totalNumberOfSamples += (int)cell.getNumericCellValue();
-            		availInfinium = true;
+	        		serviceAvailed = "INF";
             	}
+	        	
+	        	// PlantTrak
+	        	else if(cell.getNumericCellValue() == 0 && cell2.getNumericCellValue() != 0){
+	        		totalNumberOfSamples += (int)cell2.getNumericCellValue();
+	        		serviceAvailed = "PlantTrak";
+	        	}
+	        	
+	        	// Infinium + PlantTrak
+	        	else if(cell.getNumericCellValue() != 0 && cell2.getNumericCellValue() != 0 && cell.getNumericCellValue() == cell2.getNumericCellValue()){
+	        		totalNumberOfSamples += (int)cell.getNumericCellValue();
+	        		serviceAvailed = "PlantTrakINF";
+	        	}
+	        	
+	        	
+	        	/*	ERROR, can be caused by
+	        	 	- all fields in question are empty
+	        	 	- values are placed for Infinium and PlantTrak, yet values are not equal
+	        	 */
+	        	else{
+	        		noError = false;
+	        	}
 	        	
 	        	// TO DO: Additional Services
 	        	
@@ -134,19 +159,55 @@ public class MainProgram {
 
         	
         	//// BLOCK 0003 : WRITING TO PRIMARY FILE FOR SELENIUM /////////////////////////////////
-	    	
-        		if(availInfinium){
-	            	            	
-	            	int sobra = (totalNumberOfSamples % 94 == 0) ? 0 : 1;
-	            	int counter = (totalNumberOfSamples / 94) + sobra;
-	            	for(int i=0; i<counter; i++){
-	    	        	GenotypingService infinium = new GenotypingService("P109403", (3*serviceList.size())+1, i+1);
-	    	        	if(infinium.getMaterialClass()){
-	    	        		matClassification = true;
-	    	        	}
-	    	        	serviceList.add(infinium);
-	            	}
-	            }
+        		
+				if(!(serviceAvailed.equals("NONE"))){
+					int excessSamples;
+					int counter;
+				
+					switch(serviceAvailed){
+					
+						case "INF": 
+							excessSamples = (totalNumberOfSamples % 94 == 0) ? 0 : 1;
+							counter = (totalNumberOfSamples / 94) + excessSamples;
+				
+							for(int i=0; i<counter; i++){
+								GenotypingService serbisyo = new GenotypingService("P109403", (3*serviceList.size())+1, i+1);
+								if(serbisyo.getMaterialClass()){
+									matClassification = true;
+								}
+								serviceList.add(serbisyo);
+							}
+				
+						break;
+				
+						case "PlantTrak": 
+							excessSamples = (totalNumberOfSamples % 94 == 0) ? 0 : 1;
+							counter = (totalNumberOfSamples / 94) + excessSamples;
+				
+							for(int i=0; i<counter; i++){
+								GenotypingService serbisyo = new GenotypingService("P109405", (3*serviceList.size())+1, i+1);
+								if(serbisyo.getMaterialClass()){
+									matClassification = true;
+								}
+								serviceList.add(serbisyo);
+							}
+						break;
+					
+						case "PlantTrakINF": 
+							excessSamples = (totalNumberOfSamples % 94 == 0) ? 0 : 1;
+							counter = (totalNumberOfSamples / 94) + excessSamples;
+				
+							for(int i=0; i<counter; i++){
+								GenotypingService serbisyo = new GenotypingService("P109403P109405", (3*serviceList.size())+1, i+1);
+								if(serbisyo.getMaterialClass()){
+									matClassification = true;
+								}
+								serviceList.add(serbisyo);
+							}
+						break;
+					}
+				}
+        		
 	    		boolean correctInfo = true;
 	            for(int i=0; i<serviceList.size(); i++){
 	            	if(!(serviceList.get(i).getCorrectness())){
@@ -155,7 +216,7 @@ public class MainProgram {
 	            	
 	            }
 
-	            if(correctInfo){
+	            if(correctInfo && noError){
 	            
 	                FileWriter fwriter = new FileWriter(new File("requestInfo.txt"));
 	        		BufferedWriter bw = new BufferedWriter(fwriter);
@@ -199,7 +260,7 @@ public class MainProgram {
 		//String username = sc.nextLine();
 		//System.out.print("Password: ");
 		//String password = sc.nextLine();
-		WebLoader well = new WebLoader();
+		WebLoader well = new WebLoader(serviceAvailed);
 	}
 
 }
