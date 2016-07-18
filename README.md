@@ -15,9 +15,9 @@
   Open a terminal and input these lines of code. \(Reference [here](http://tecadmin.net/install-oracle-java-8-jdk-8-ubuntu-via-ppa/#) \) <br />
 
 ```
-sudo add-apt-repository ppa:webupd8team/java
-sudo apt-get update
-sudo apt-get install oracle-java8-installer
+      sudo add-apt-repository ppa:webupd8team/java
+      sudo apt-get update
+      sudo apt-get install oracle-java8-installer
 ```
   
   note that these requires administrator\(sudo\) privileges and therefore may prompt you to enter your password <br />
