@@ -11,7 +11,7 @@
 
 ### Installing Eclipse and Selenium Webdriver
 ###### Adapted for Linux Systems from guru99.com's [installation guide](http://www.guru99.com/installing-selenium-webdriver.html) for Windows
-####1. Install Java SDK \(this program used Java 8\)
+**1. Install Java SDK \(this program used Java 8\)**
     Open a terminal and input these lines of code. \(Reference [here](http://tecadmin.net/install-oracle-java-8-jdk-8-ubuntu-via-ppa/#) \) <br />
       `sudo add-apt-repository ppa:webupd8team/java` <br />
       `sudo apt-get update` <br />
