@@ -19,5 +19,4 @@
       sudo apt-get update
       sudo apt-get install oracle-java8-installer
 ```
-  
     note that these requires administrator\(sudo\) privileges and therefore may prompt you to enter your password <br />
