@@ -1,6 +1,5 @@
 package webprogram;
 
-import java.util.Scanner;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -9,8 +8,10 @@ import java.io.FileReader;
 
 
 import org.apache.log4j.PropertyConfigurator;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
@@ -20,6 +21,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.Keys;
 //import plantdata.PlantSample;
 
 	public class WebLoader {
@@ -28,22 +31,26 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 		private String logInPassword;
 		
 		
-		public WebLoader(String serviceInput){
+		public WebLoader(String user, String password, String serviceInput){
 		
+				
 		// replace/correct the absolute path of log4j.properties
 		String log4jConfPath = "/home/karljasson/workspace/Selenium for GSL Form 1/log4j/log4j.properties";
 		PropertyConfigurator.configure(log4jConfPath);
 		
-		DesiredCapabilities caps = new DesiredCapabilities();
-    	caps.setJavascriptEnabled(true);
+		//DesiredCapabilities caps = new DesiredCapabilities();
+    	//caps.setJavascriptEnabled(true);
     	
-    	System.out.println("JavascriptEnabled: "+Boolean.toString(caps.isJavascriptEnabled()));
-    	caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "/usr/bin/phantomjs");
-    	caps.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, new String[] {"--web-security=no", "--ignore-ssl-errors=yes"});
-    	WebDriver driver = new PhantomJSDriver(caps);
+    	//System.out.println("JavascriptEnabled: "+Boolean.toString(caps.isJavascriptEnabled()));
+    	//caps.setCapability(PhantomJSDriverService.PHANTOMJS_EXECUTABLE_PATH_PROPERTY, "/usr/bin/phantomjs");
+    	//caps.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, new String[] {"--web-security=no", "--ignore-ssl-errors=yes"});
+    	//WebDriver driver = new PhantomJSDriver(caps);
 			
 		String baseUrl =  "http://btree.ocimumbio.com/irri-test/";
 		WebElement myDynamicElement;
+		
+		System.setProperty("webdriver.chrome.driver", "/usr/bin/chromedriver");
+		WebDriver driver = new ChromeDriver();
 
 		driver.manage().timeouts().pageLoadTimeout(90, TimeUnit.SECONDS);
 		driver.manage().window().maximize();
@@ -62,8 +69,12 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 					//System.out.print("Password: ");
 					//logInPassword = sc.nextLine();
 				
-					logInUsername = "karljasson";
-					logInPassword = "dakotiyan5`";
+					//logInUsername = "karljasson";
+					//logInPassword = "dakotiyan5`";
+					logInUsername = user;
+					logInPassword = password;
+					
+					
 				
 					driver.findElement(By.id("userId")).clear();
 					driver.findElement(By.id("userId")).sendKeys(logInUsername);
@@ -74,7 +85,9 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 				    //temp.click();
 
 				    try{   
-				    	((JavascriptExecutor) driver).executeScript("window.confirm = function(msg) { return true; }");
+				    	//((JavascriptExecutor) driver).executeScript("window.confirm = function(msg) { return true; }");
+				    	Alert ale = driver.switchTo().alert();
+				    	ale.accept();
 				    }catch(Exception eee){
 				    	
 				    }
@@ -164,7 +177,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 				driver.findElement(By.id("Comments")).sendKeys("Division: "+mappings.get("Division")+"\n");
 				driver.findElement(By.id("Comments")).sendKeys("Date submitted: "+mappings.get("Date submitted"));
 				
-				driver.findElement(By.className("save")).click();
+				//driver.findElement(By.className("save")).click();
+				driver.findElement(By.className("save")).sendKeys(Keys.RETURN);
 				
 			//// END BLOCK 0002 /////////////////**/////////////////////////////////////////////////////////////////////
 				
@@ -182,17 +196,21 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 						
 					}
 					System.out.println("Uploading file number "+(i+1));
+					myDynamicElement = (new WebDriverWait(driver, 25))
+							  .until(ExpectedConditions.presenceOfElementLocated(By.id("ext-gen61")));
 					driver.findElement(By.id("ext-gen61")).click();
 					
 					
 					
 					driver.findElement(By.id("file")).sendKeys("/home/karljasson/workspace/Selenium for GSL Form 1/"+mappings.get("FILE"+(i+1)));
 				
-					driver.findElement(By.className("next")).click();
+					//driver.findElement(By.className("next")).click();
+					driver.findElement(By.className("next")).sendKeys(Keys.RETURN);
 					
 					driver.manage().timeouts().implicitlyWait(35, TimeUnit.SECONDS);
 					
-					driver.findElement(By.className("next")).click();
+					//driver.findElement(By.className("next")).click();
+					driver.findElement(By.className("next")).sendKeys(Keys.RETURN);
 
 					driver.manage().timeouts().implicitlyWait(15, TimeUnit.SECONDS);
 					
@@ -202,7 +220,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 						}catch(Exception eeh){
 							
 						}
-						driver.findElement(By.className("save")).click();
+						//driver.findElement(By.className("save")).click();
+						driver.findElement(By.className("save")).sendKeys(Keys.RETURN);
 						driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 					}
 				}
@@ -222,7 +241,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 			System.out.println(ey.getMessage());
 			
 		}finally{
-			myDynamicElement = (new WebDriverWait(driver, 20))
+			myDynamicElement = (new WebDriverWait(driver, 30))
 					  .until(ExpectedConditions.presenceOfElementLocated(By.id("ext-gen14")));
 			driver.findElement(By.id("ext-gen14")).click();
 			driver.findElement(By.id("ext-comp-1010")).click();
